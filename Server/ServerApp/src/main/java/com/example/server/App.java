@@ -31,9 +31,10 @@ public class App {
         ServerSocket serverSocket = new ServerSocket(12345);
         // Sabit sayıda iş parçacığı oluşturuldu.
         ExecutorService executor = Executors.newFixedThreadPool(1000);
-
+        int i = 0;
         // Belirlediğimiz sayıda işlem yapılması için bir for döngüsü
-        while (true) {
+        while (true)  {
+            i++;
             // Sunucudan gelen bağlantı isteklerini kabul eder.
             Socket clientSocket = serverSocket.accept();
             // "executor.submit(() -> {}" ifadesi gönderilen iş parçasını asenkron olarak yürütülmesi için iş parçacığı havuzuna eklenir.
@@ -54,7 +55,6 @@ public class App {
                     String operationStr = requestNode.get("operation").asText();
                     int num1 = requestNode.get("num1").asInt();
                     int num2 = requestNode.get("num2").asInt();
-
                     // Operasyonları işleme ve sonucu hesaplama
                     double result = 0;
                     if (operationStr.equals(Operation.ADD.name())) {
@@ -80,6 +80,7 @@ public class App {
                     Thread.sleep(delaytime);
                     // Yanıt sockete BufferedReader nesnesi ile yazılır.
                     writer.println(responseJson);
+
                 }
                //girdi/çıktı işlemleri sırasında hataların yakalanmasını sağlar.
                 catch (IOException e) {
@@ -89,14 +90,16 @@ public class App {
                 catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 } finally {
+                    // socket kapatılmasını sağlar.
                     try {
-                        // socketin kapatılmasını sağlar.
                         clientSocket.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
+
                 }
             });
+
 
         }
     }
